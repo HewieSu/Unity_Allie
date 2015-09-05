@@ -34,10 +34,8 @@ public class GM : MonoBehaviour {
 	private Player player;
 	private Hunter hunter;
 	private Wolf wolf;
-	//swich curr npc let GM report to,let each npc refresh the state themself
-	public string currNpcSpeakTo;//curr using dialogSystem NPC;
-	public int hunterState;//task state in hunter,let npc load for
-	public int wolfState;//task state in wolf,let npc load for
+	//state
+	public bool suggest;
 	//item
 	public bool hunterHand;
 	public bool wolfWild;
@@ -71,8 +69,6 @@ public class GM : MonoBehaviour {
 		*/
 	}
 	void Update () {
-		//Dialog ();
-		OpenToForest ();
 		DieAndHp ();
 		ItemUI();
 	}
@@ -112,7 +108,6 @@ public class GM : MonoBehaviour {
 				canTalk = false;
 				player.canMove = true;
 				diaLogBox.SetActive(false);
-				//RefreshState(currNpcSpeakTo);
 				i = 0;
 				return true;
 			}
@@ -143,11 +138,8 @@ public class GM : MonoBehaviour {
 
 	}
 	//h01_3結束後拿到水果刀&開啟往森林之路
-	void OpenToForest(){
+	public void OpenToForest(){
 		GameObject wallToForest = GameObject.Find("Scene/WallToForest");
-		if(hunterState == 3 && wallToForest){
-			sword = true;
-			Destroy(wallToForest);
-		}
+		wallToForest.SetActive (false);
 	}
 }

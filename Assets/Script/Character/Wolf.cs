@@ -5,6 +5,7 @@ public class Wolf : MonoBehaviour {
 
 	
 	private Player player;
+	private Hunter hunter;
 	private bool facingRight;
 	public float hp;
 	private float currHp;
@@ -17,7 +18,7 @@ public class Wolf : MonoBehaviour {
 	public bool a = true;//避免重複刷新開關1.進入該npc範圍2.對話結束時 刷新一次
 	//taskState
 	public string currStateStr;//currstate string,change in npc
-	public int currStateInt;
+	public string lastStateStr;
 	//Dialog switch
 	bool DialogSwitch;
 	bool AcptSwitch;//限定目前npc使用acpt(),防止其他npc呼叫對話系統,一個以上任務在同個npc則會有bug
@@ -25,11 +26,13 @@ public class Wolf : MonoBehaviour {
 	void Start () {
 		gm = GameObject.Find("Main Camera").GetComponent<GM>();
 		player = GameObject.Find("Allie").GetComponent<Player>();
+		hunter = GameObject.Find ("Hunter").GetComponent<Hunter> ();
 		talkbox = GameObject.Find("Wolf/TalkBox");
 		talkbox.SetActive(false);
 		currHp = hp;
 	}
 	void Update () {
+		Acpt ();
 		TalkActive();
 		FlipSwitch ();
 	}
@@ -68,6 +71,14 @@ public class Wolf : MonoBehaviour {
 				Debug.Log("dialog over");
 				a =!a;
 				AcptSwitch = false;
+				lastStateStr = currStateStr;
+				if(currStateStr == "w01"){
+					gm.suggest = true;
+					Debug.Log("take suggest");
+				}
+				if(currStateStr == "w05"){
+					Destroy(gameObject);
+				}
 			}
 		}
 	}
@@ -77,29 +88,24 @@ public class Wolf : MonoBehaviour {
 		//switch off
 		a = !a;
 		AcptSwitch = true;
-		//get curr state from GM
-		currStateInt += 1;
-		//send messege tell GM currNPC let GM know who's state should refresh
-		gm.currNpcSpeakTo = "wolf";
-		//use currStateInt decide task load
-		//分歧點為關鍵道具
-		switch (currStateInt) {
-		case 0:
-			currStateStr = "w01";
-			break;
-		case 1:
-			currStateStr = "w02";
-			break;
-		case 2:
-			currStateStr = "w03";
-			break;
-		default:
-			currStateStr = null;
-			Debug.Log("nothing to load now");
-			a = !a;
-			break;
+		if(currHp > 0){
+			if(hunter){
+				if(gm.suggest){
+					currStateStr = "w03";
+				}else{
+					currStateStr = "w01";
+				}
+			}else{
+				if(gm.suggest){
+					currStateStr = "w04";
+				}else{
+					currStateStr = "w02";
+				}
+			}
 		}
-		
+		if(currStateStr == lastStateStr){
+			currStateStr = null;
+		}
 	}
 	//觸發範圍繪製
 	void OnDrawGizmosSelected() {
@@ -107,9 +113,9 @@ public class Wolf : MonoBehaviour {
 		Gizmos.DrawWireSphere(transform.position, triggerDis);
 	}
 	void FlipSwitch(){
-		if(Input.GetKeyDown("c") && gm.currNpcSpeakTo == "wolf" && player.transform.position.x > transform.position.x && !facingRight){
+		if(Input.GetKeyDown("c") && AcptSwitch && player.transform.position.x > transform.position.x && !facingRight){
 			Flip();
-		}else if(Input.GetKeyDown("c") && gm.currNpcSpeakTo == "wolf" && player.transform.position.x < transform.position.x && facingRight){
+		}else if(Input.GetKeyDown("c") && AcptSwitch && player.transform.position.x < transform.position.x && facingRight){
 			Flip();
 		}
 	}
@@ -137,10 +143,11 @@ public class Wolf : MonoBehaviour {
 		Debug.Log ("wolf's HP = " + currHp);
 		if(currHp <= 0){
 			gm.wolfWild = true;
+			currStateStr = "w05";
+			Debug.Log("get wolf wild");
 			if(lastAtkWeapon == "sword"){
 				gm.canGetBothItem = true;
 			}
-			Destroy(gameObject);
 		}
 	}
 }

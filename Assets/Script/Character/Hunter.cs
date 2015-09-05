@@ -18,6 +18,7 @@ public class Hunter : MonoBehaviour {
 
 	private Player player;
 	private GM gm;
+	private Wolf wolf;
 	//setting
 	public float hp;
 	private float currHp;
@@ -31,7 +32,7 @@ public class Hunter : MonoBehaviour {
 	public bool a = true;//避免重複刷新開關1.進入該npc範圍2.對話結束時 刷新一次
 	//taskState
 	public string currStateStr;//currstate string,change in npc
-	public int currStateInt;//currstate int,change in GM
+	public string lastStateStr;
 	//Dialog switch
 	bool DialogSwitch;
 	bool AcptSwitch;//限定目前npc使用acpt(),防止其他npc呼叫對話系統,一個以上任務在同個npc則會有bug
@@ -39,6 +40,7 @@ public class Hunter : MonoBehaviour {
 	void Start () {
 		gm = GameObject.Find("Main Camera").GetComponent<GM>();
 		player = GameObject.Find("Allie").GetComponent<Player>();
+		wolf = GameObject.Find("Wolf").GetComponent<Wolf>();
 		talkbox = GameObject.Find("Hunter/TalkBox");
 		talkbox.SetActive(false);
 		currHp = hp;
@@ -84,38 +86,40 @@ public class Hunter : MonoBehaviour {
 				Debug.Log("dialog over");
 				a =!a;
 				AcptSwitch = false;
+				lastStateStr = currStateStr;
+				if(currStateStr == "h01"){
+					gm.sword = true;
+					gm.OpenToForest();
+				}
+				if(currStateStr == "h02"){
+					Destroy(gameObject);
+				}
+				if(currStateStr == "h03"){
+					gm.gun = true;
+				}
 			}
 		}
 	}
-	//設定各任務階段npc所要loading的對話內容＆進行動作
+	//設定各任務階段npc所要loading的對話內容
 	//設定目前對話npc(讓GM知道要回傳完成訊息的npc)
 	void TaskState(){
 		//switch off
 		a = !a;
 		AcptSwitch = true;
-		//get curr state from GM
-		currStateInt += 1;
-		//send messege tell GM currNPC let GM know who's state should refresh
-		//gm.currNpcSpeakTo = "hunter";
-		//use currStateInt decide task load
-		//分歧點為關鍵道具
-		switch (currStateInt) {
-		case 0:
-			currStateStr = "h01_1";
-			break;
-		case 1:
-			currStateStr = "h01_2";
-			break;
-		case 2:
-			currStateStr = "h01_3";
-			break;
-		default:
-			currStateStr = null;
-			Debug.Log("nothing to load now");
-			a = !a;
-			break;
+		if(currHp > 0){
+			if(wolf){
+				if(gm.suggest){
+					currStateStr = "h03";
+				}else{
+					currStateStr = "h01";
+				}
+			}else{
+				currStateStr = "h04";
+			}
 		}
-
+		if(currStateStr == lastStateStr){
+			currStateStr = null;
+		}
 	}
 	//觸發範圍繪製
 	void OnDrawGizmosSelected() {
@@ -123,9 +127,9 @@ public class Hunter : MonoBehaviour {
 		Gizmos.DrawWireSphere(transform.position, triggerDis);
 	}
 	void FilpSwitch(){
-		if(Input.GetKeyDown("c") && gm.currNpcSpeakTo == "hunter" && player.transform.position.x > transform.position.x && !facingRight){
+		if(Input.GetKeyDown("c") && AcptSwitch && player.transform.position.x > transform.position.x && !facingRight){
 			Flip();
-		}else if(Input.GetKeyDown("c") && gm.currNpcSpeakTo == "hunter" && player.transform.position.x < transform.position.x && facingRight){
+		}else if(Input.GetKeyDown("c") && AcptSwitch && player.transform.position.x < transform.position.x && facingRight){
 			Flip();
 		}
 	}
@@ -153,10 +157,11 @@ public class Hunter : MonoBehaviour {
 		Debug.Log ("hunter's HP = " + currHp);
 		if(currHp <= 0){
 			gm.hunterHand = true;
+			Debug.Log("get hunter's hand");
+			currStateStr = "h02";
 			if(lastAtkWeapon == "Gun"){
 				gm.canGetBothItem = true;
 			}
-			Destroy(gameObject);
 		}
 	}
 }
