@@ -126,14 +126,21 @@ public class Wolf : MonoBehaviour {
 		theScale.x *= -1;
 		transform.localScale = theScale;
 	}
-	//觸發戰鬥模式
+	//觸發戰鬥偵測
 	void OnTriggerEnter2D(Collider2D coll) {
 		if (coll.name == "Sword" || coll.name == "Bullet(Clone)"){
-			Collider2D collider = gameObject.GetComponent<Collider2D>();
-			collider.isTrigger = false;
-			Debug.Log("atk");
-			Debug.Log(collider.isTrigger);
+			BattleModeOn();
 		}
+	}
+	void BattleModeOn(){
+		Collider2D collider = gameObject.GetComponent<Collider2D>();
+		collider.isTrigger = false;
+		Debug.Log("battle mode on");
+	}
+	void BattleModeOff(){
+		Collider2D collider = gameObject.GetComponent<Collider2D>();
+		collider.isTrigger = true;
+		Debug.Log("battle mode off");
 	}
 	void AtkMode(){
 		

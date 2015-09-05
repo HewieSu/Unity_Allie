@@ -31,11 +31,14 @@ public class GM : MonoBehaviour {
 	int i = 0;//目前句數
 	//string[] strs;//外部讀取用
 	//character
+	public CamFollow camfollow;
 	private Player player;
 	private Hunter hunter;
 	private Wolf wolf;
 	//state
 	public bool suggest;
+	public bool fighting;
+	public bool talking;
 	//item
 	public bool hunterHand;
 	public bool wolfWild;
@@ -57,6 +60,7 @@ public class GM : MonoBehaviour {
 		player = GameObject.Find("Allie").GetComponent<Player>();
 		hunter = GameObject.Find ("Hunter").GetComponent<Hunter>();
 		wolf = GameObject.Find("Wolf").GetComponent<Wolf>();
+		camfollow = GetComponent<CamFollow>();
 		diaLogBox.SetActive(false);
 		image_Sword.enabled = false;
 		image_Gun.enabled = false;

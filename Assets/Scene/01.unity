@@ -818,7 +818,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 374559904}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 65.9000015, y: 5, z: 0}
+  m_LocalPosition: {x: -94.1999969, y: 5, z: 0}
   m_LocalScale: {x: 2.11472297, y: 2.11472464, z: 2.11472464}
   m_Children:
   - {fileID: 2116182330}
@@ -1116,7 +1116,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 563999984}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -83.4000015, y: 10.8999996, z: -.800000012}
+  m_LocalPosition: {x: -88.5, y: 10.8999996, z: -.800000012}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -1132,6 +1132,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 826f07c18e36a9549931e5770f18e113, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Following: 1
 --- !u!114 &563999991
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1146,7 +1147,10 @@ MonoBehaviour:
   diaLogBox: {fileID: 0}
   diaLogText: {fileID: 0}
   canTalk: 0
+  camfollow: {fileID: 0}
   suggest: 0
+  fighting: 0
+  talking: 0
   hunterHand: 0
   wolfWild: 0
   BearDoll: 0
