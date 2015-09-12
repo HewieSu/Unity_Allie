@@ -64,6 +64,7 @@ public class Wolf : MonoBehaviour {
 	//把主控轉回npc,點擊一次執行一次對話系統
 	void Acpt(){
 		if(Input.GetKeyDown("c") && AcptSwitch){
+			gm.talking = true;
 			//執行對話系統
 			DialogSwitch = gm.Dialog();
 			//當對話結束
@@ -80,6 +81,7 @@ public class Wolf : MonoBehaviour {
 					Destroy(gameObject);
 				}
 			}
+			gm.talking = false;
 		}
 	}
 	//設定各任務階段npc所要loading的對話內容＆進行動作
@@ -129,26 +131,17 @@ public class Wolf : MonoBehaviour {
 	//觸發戰鬥偵測
 	void OnTriggerEnter2D(Collider2D coll) {
 		if (coll.name == "Sword" || coll.name == "Bullet(Clone)"){
-			BattleModeOn();
+			gm.BattleModeSwitch(gameObject);
 		}
 	}
-	void BattleModeOn(){
-		Collider2D collider = gameObject.GetComponent<Collider2D>();
-		collider.isTrigger = false;
-		Debug.Log("battle mode on");
-	}
-	void BattleModeOff(){
-		Collider2D collider = gameObject.GetComponent<Collider2D>();
-		collider.isTrigger = true;
-		Debug.Log("battle mode off");
-	}
-	void AtkMode(){
+	void AtkAI(){
 		
 	}
 	public void Hurt(float damage){
 		currHp -= damage;
 		Debug.Log ("wolf's HP = " + currHp);
 		if(currHp <= 0){
+			gm.BattleModeSwitch(gameObject);
 			gm.wolfWild = true;
 			currStateStr = "w05";
 			Debug.Log("get wolf wild");

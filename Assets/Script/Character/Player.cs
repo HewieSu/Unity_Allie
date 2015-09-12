@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine.UI;
 
 public class Player : MonoBehaviour {
+	private GM gm;
 	//hp
 	public float hp = 100f;
 	public float currHp;
@@ -32,14 +33,20 @@ public class Player : MonoBehaviour {
 	//anim
 	private Animator animator;
 	void Start () {
+		gm = GameObject.Find("Main Camera").GetComponent<GM>();
 		currHp = hp;
 		rigi = GetComponent<Rigidbody2D>();
 		animator = gameObject.GetComponent<Animator>();
 	}	
 	void Update () {
+		if (!gm.talking) {
+			Att ();
+			Bullet ();
+			canMove = true;
+		} else {
+			canMove = false;
+		}
 		Move();
-		Bullet();
-		Att ();
 		GroundedCheck();
 	}
 	//移動

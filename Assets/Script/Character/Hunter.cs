@@ -79,6 +79,7 @@ public class Hunter : MonoBehaviour {
 	//把主控轉回npc,點擊一次執行一次對話系統
 	void Acpt(){
 		if(Input.GetKeyDown("c") && AcptSwitch){
+			gm.talking = true;
 			//執行對話系統
 			DialogSwitch = gm.Dialog();
 			//當對話結束
@@ -97,6 +98,7 @@ public class Hunter : MonoBehaviour {
 				if(currStateStr == "h03"){
 					gm.gun = true;
 				}
+				gm.talking = false;
 			}
 		}
 	}
@@ -143,29 +145,17 @@ public class Hunter : MonoBehaviour {
 	//觸發戰鬥偵測
 	void OnTriggerEnter2D(Collider2D coll) {
 		if (coll.name == "Sword" || coll.name == "Bullet(Clone)"){
-			BattleModeOn();
+			gm.BattleModeSwitch(gameObject);
 		}
 	}
-	void BattleModeOn(){
-		Collider2D collider = gameObject.GetComponent<Collider2D>();
-		collider.isTrigger = false;
-		gm.fighting = true;
-		Debug.Log("battle mode on");
-		gm.camfollow.Following = false;
-	}
-	void BattleModeOff(){
-		Collider2D collider = gameObject.GetComponent<Collider2D>();
-		collider.isTrigger = true;
-		Debug.Log("battle mode off");
-		gm.camfollow.Following = true;
-	}
-	void AtkMode(){
+	void AtkAI(){
 
 	}
 	public void Hurt(float damage){
 		currHp -= damage;
 		Debug.Log ("hunter's HP = " + currHp);
 		if(currHp <= 0){
+			gm.BattleModeSwitch(gameObject);
 			gm.hunterHand = true;
 			Debug.Log("get hunter's hand");
 			currStateStr = "h02";

@@ -52,8 +52,7 @@ public class GM : MonoBehaviour {
 	public Image image_Gun;
 	//can get both item
 	public bool canGetBothItem;
-	//SceneObj
-	//private GameObject wallToForest;
+
 	void Start () {
 		diaLogBox = GameObject.Find("Canvas/UICamera/Dialog box");
 		diaLogText = GameObject.Find("Canvas/UICamera/Dialog box/Text").GetComponent<Text>();
@@ -76,7 +75,6 @@ public class GM : MonoBehaviour {
 		DieAndHp ();
 		ItemUI();
 	}
-
 	//讀取對話並轉成文字陣列
 	public void LoadStrs(string txtName){
 		//內部讀取
@@ -88,29 +86,17 @@ public class GM : MonoBehaviour {
 			textAsset = null;//clean data
 		}
 	}
-	/*//更新各npc任務狀態(進度)
-	void RefreshState(string npcName){
-		if(npcName == "hunter"){
-			hunterState += 1;
-			hunter.a = !hunter.a;//switch on
-		}else{
-			wolfState += 1;
-			wolf.a = !wolf.a;//switch on
-		}
-	}*/
 	//對話框模組
-	public bool Dialog(){ // Test
+	public bool Dialog(){
 		if(textAsset){
 			//按下對話鍵(c)且目前句數i<總句數
-			if(Input.GetKeyDown("c") && canTalk && i < currStrs.Length){;
-				player.canMove = false;
+			if(Input.GetKeyDown("c") && canTalk && i < currStrs.Length){
 				diaLogBox.SetActive(true);
 				diaLogText.text = currStrs[i];
 				i++;
 				return false;
-			}else if(Input.GetKeyDown("c") && i == currStrs.Length){//對話完畢將完成資訊回傳至該npc
+			}else if(Input.GetKeyDown("c") && i == currStrs.Length){
 				canTalk = false;
-				player.canMove = true;
 				diaLogBox.SetActive(false);
 				i = 0;
 				return true;
@@ -138,7 +124,19 @@ public class GM : MonoBehaviour {
 			
 		}
 	}
-	void BackPack(){
+	public void BattleModeSwitch(GameObject enemy){
+		fighting = !fighting;
+		if (fighting) {
+			Collider2D collider = enemy.GetComponent<Collider2D>();
+			collider.isTrigger = false;
+			Debug.Log ("battle mode on > " + enemy.name);
+			camfollow.Following = false;
+		} else {
+			Collider2D collider = enemy.GetComponent<Collider2D>();
+			collider.isTrigger = true;
+			Debug.Log("battle mode off");
+			camfollow.Following = true;
+		}
 
 	}
 	//h01_3結束後拿到水果刀&開啟往森林之路
