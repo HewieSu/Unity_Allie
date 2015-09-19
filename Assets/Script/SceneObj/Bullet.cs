@@ -26,9 +26,6 @@ public class Bullet : MonoBehaviour {
 		
 	}
 	void OnTriggerEnter2D(Collider2D coll){
-		Destroy(gameObject);
-	}
-	void OnCollisionEnter2D(Collision2D coll) {
 		string id = coll.gameObject.name;
 		if(id == "Hunter"){
 			hunter.Hurt (bltDamage);
@@ -37,8 +34,12 @@ public class Bullet : MonoBehaviour {
 		if(id == "Wolf"){
 			wolf.Hurt(bltDamage);
 		}
-		Debug.Log ("bullet hit = " + bltDamage);
+		Debug.Log ("bullet hit = " + id);
+		Debug.Log ("hit by " + coll.name);
 		Destroy(gameObject);
+	}
+	void OnCollisionEnter2D(Collision2D coll) {
+
 
 	}
 }

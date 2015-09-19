@@ -36,20 +36,34 @@ public class Hunter : MonoBehaviour {
 	//Dialog switch
 	bool DialogSwitch;
 	bool AcptSwitch;//限定目前npc使用acpt(),防止其他npc呼叫對話系統,一個以上任務在同個npc則會有bug
+	//AtkAI
+	public float walkSpeed;
+	public float nearAtkDis;
+	public float cdTime;
+	float currTime;
+	Vector2 target;
+	GameObject sword;
+	bool getPlayerLoc;
+	bool countDownOver;
+	bool fightOn;
 
 	void Start () {
 		gm = GameObject.Find("Main Camera").GetComponent<GM>();
 		player = GameObject.Find("Allie").GetComponent<Player>();
 		wolf = GameObject.Find("Wolf").GetComponent<Wolf>();
 		talkbox = GameObject.Find("Hunter/TalkBox");
+		sword = GameObject.Find("Hunter/HunterSword");
+		sword.SetActive (false);
 		talkbox.SetActive(false);
 		currHp = hp;
+		currTime = cdTime;
 	}
 
 	void Update () {
 		Acpt ();
 		TalkActive();
 		FilpSwitch ();
+		AtkAI ();
 	}
 	//傳送目前對話進度至GM，離開範圍時清空
 	void TalkActive(){
@@ -127,6 +141,7 @@ public class Hunter : MonoBehaviour {
 	void OnDrawGizmosSelected() {
 		Gizmos.color = Color.yellow;
 		Gizmos.DrawWireSphere(transform.position, triggerDis);
+		Gizmos.DrawWireSphere(transform.position, nearAtkDis);
 	}
 	void FilpSwitch(){
 		if(Input.GetKeyDown("c") && AcptSwitch && player.transform.position.x > transform.position.x && !facingRight){
@@ -144,18 +159,17 @@ public class Hunter : MonoBehaviour {
 	}
 	//觸發戰鬥偵測
 	void OnTriggerEnter2D(Collider2D coll) {
-		if (coll.name == "Sword" || coll.name == "Bullet(Clone)"){
+		if (coll.name == "Sword" || coll.name == "Bullet(Clone)" && !fightOn){
 			gm.BattleModeSwitch(gameObject);
+			fightOn = true;
 		}
-	}
-	void AtkAI(){
-
 	}
 	public void Hurt(float damage){
 		currHp -= damage;
 		Debug.Log ("hunter's HP = " + currHp);
 		if(currHp <= 0){
 			gm.BattleModeSwitch(gameObject);
+			fightOn = false;
 			gm.hunterHand = true;
 			Debug.Log("get hunter's hand");
 			currStateStr = "h02";
@@ -163,5 +177,57 @@ public class Hunter : MonoBehaviour {
 				gm.canGetBothItem = true;
 			}
 		}
+	}
+	void AtkAI(){
+		if(fightOn){
+			//CD clock
+			if (currTime >= 0) {
+				countDownOver = false;
+				currTime -= Time.deltaTime;
+			} else {
+				countDownOver = true;
+			}
+			//decide act
+			if(countDownOver){
+				Move();
+			}
+		}
+	}
+	void GetPlayerLoc(){
+		//get player position
+		if(!getPlayerLoc){
+			//flip or not
+			if(transform.position.x - player.transform.position.x < 0 && !facingRight){
+				nearAtkDis *= -1;
+				Flip();
+			}
+			if(transform.position.x - player.transform.position.x > 0 && facingRight){
+				Flip();
+			}
+			target = new Vector2 (player.transform.position.x , transform.position.y);
+			getPlayerLoc = true;
+		}
+	}
+	void Move(){
+		GetPlayerLoc ();
+		sword.SetActive (true);
+		float Speed = walkSpeed * Time.deltaTime;
+		transform.position = Vector2.MoveTowards (new Vector2(transform.position.x,transform.position.y) ,target,Speed);
+		//when act is over
+		if(transform.position.x == target.x){
+			sword.SetActive(false);
+			//reset cd
+			currTime = cdTime;
+			getPlayerLoc = false;
+		}
+	}
+	void AISword(){
+
+	}
+	void AIGun(){
+
+	}
+	void AIBomb(){
+
 	}
 }
